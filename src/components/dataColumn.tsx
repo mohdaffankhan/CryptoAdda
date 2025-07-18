@@ -13,6 +13,7 @@ export const columns: ColumnDef<MarketData>[] = [
   },
   {
     accessorKey: "current_price",
+
     header: "Price",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("current_price"));

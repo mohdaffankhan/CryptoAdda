@@ -17,14 +17,19 @@ function Index() {
     }, []);
 
     return (
-      <div className="p-2 dark:bg-black dark:text-white">
-        <h1>Market Data</h1>
+      <div className="min-h-screen dark:bg-black dark:text-white px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6 text-center">📈 Today's Market Overview</h1>
+
         {loading ? (
-          <p>Loading...</p>
+          <p className="text-center text-gray-400">Loading market data...</p>
         ) : (
-          <DataTable columns={columns} data={marketData} />
+          <div className="overflow-x-auto rounded-lg border border-gray-700">
+            <DataTable columns={columns} data={marketData} />
+          </div>
         )}
       </div>
+    </div>
     );
   }
 }
