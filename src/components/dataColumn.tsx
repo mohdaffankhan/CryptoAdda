@@ -1,4 +1,9 @@
-import { formatChange, formatDollar, formatPrice } from "@/lib/formatters";
+import {
+  formatChange,
+  formatDollar,
+  formatNumber,
+  formatPrice,
+} from "@/lib/formatters";
 import type { MarketData } from "@/types/market";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
@@ -7,12 +12,13 @@ import { ArrowUpDown } from "lucide-react";
 export const columns: ColumnDef<MarketData>[] = [
   {
     accessorKey: "name",
-    header: ()=>{
+    header: () => {
       return (
         <div className="flex items-center">
           <span className="font-semibold">Name</span>
         </div>
-    )},
+      );
+    },
     cell: ({ row }) => {
       const { name, symbol, image } = row.original;
       return (
@@ -20,7 +26,9 @@ export const columns: ColumnDef<MarketData>[] = [
           <img src={image} alt={name} className="h-6 w-6 rounded-full" />
           <div className="flex flex-col">
             <span className="font-semibold">{name}</span>
-            <span className="text-xs text-muted-foreground uppercase">{symbol}</span>
+            <span className="text-xs text-muted-foreground uppercase">
+              {symbol}
+            </span>
           </div>
         </div>
       );
@@ -109,7 +117,7 @@ export const columns: ColumnDef<MarketData>[] = [
     ),
     cell: ({ row }) => {
       const value = parseFloat(row.getValue("circulating_supply"));
-      return <div className="text-center">{value.toLocaleString()} </div>;
+      return <div className="text-center">{formatNumber(value)}</div>;
     },
   },
   {
