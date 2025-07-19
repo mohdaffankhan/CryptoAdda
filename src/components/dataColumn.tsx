@@ -8,6 +8,7 @@ import type { MarketData } from "@/types/marketData";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { BookmarkButton } from "./Bookmark";
 
 export const columns: ColumnDef<MarketData>[] = [
   {
@@ -139,4 +140,13 @@ export const columns: ColumnDef<MarketData>[] = [
       );
     },
   },
+  {
+  accessorKey: "bookmark",
+  header: () => <div className="text-center">Bookmark</div>,
+  cell: ({ row }) => {
+    const coinId = row.original.id;
+    return <BookmarkButton coinId={coinId}/>
+  },
+}
+
 ];
