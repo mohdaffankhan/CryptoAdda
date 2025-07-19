@@ -4,7 +4,7 @@ import {
   formatNumber,
   formatPrice,
 } from "@/lib/formatters";
-import type { MarketData } from "@/types/market";
+import type { MarketData } from "@/types/marketData";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
 import { ArrowUpDown } from "lucide-react";

@@ -1,3 +1,4 @@
+import CoinSearch from "@/components/coinSearch";
 import { ModeToggle } from "@/components/mode-toggle";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -21,7 +22,8 @@ export const Route = createRootRoute({
         >
           Price Chart
         </Link>
-        <ModeToggle/>
+        <CoinSearch/>
+        <ModeToggle />
       </div>
       <hr />
       <Outlet />

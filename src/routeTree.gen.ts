@@ -13,6 +13,7 @@ import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as PriceChartRouteImport } from './routes/price-chart'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CoinCoinIdRouteImport } from './routes/coin/$coinId'
 
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
@@ -34,18 +35,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoinCoinIdRoute = CoinCoinIdRouteImport.update({
+  id: '/coin/$coinId',
+  path: '/coin/$coinId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/price-chart': typeof PriceChartRoute
   '/watchlist': typeof WatchlistRoute
+  '/coin/$coinId': typeof CoinCoinIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/price-chart': typeof PriceChartRoute
   '/watchlist': typeof WatchlistRoute
+  '/coin/$coinId': typeof CoinCoinIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/price-chart': typeof PriceChartRoute
   '/watchlist': typeof WatchlistRoute
+  '/coin/$coinId': typeof CoinCoinIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/price-chart' | '/watchlist'
+  fullPaths: '/' | '/about' | '/price-chart' | '/watchlist' | '/coin/$coinId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/price-chart' | '/watchlist'
-  id: '__root__' | '/' | '/about' | '/price-chart' | '/watchlist'
+  to: '/' | '/about' | '/price-chart' | '/watchlist' | '/coin/$coinId'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/price-chart'
+    | '/watchlist'
+    | '/coin/$coinId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   PriceChartRoute: typeof PriceChartRoute
   WatchlistRoute: typeof WatchlistRoute
+  CoinCoinIdRoute: typeof CoinCoinIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coin/$coinId': {
+      id: '/coin/$coinId'
+      path: '/coin/$coinId'
+      fullPath: '/coin/$coinId'
+      preLoaderRoute: typeof CoinCoinIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   PriceChartRoute: PriceChartRoute,
   WatchlistRoute: WatchlistRoute,
+  CoinCoinIdRoute: CoinCoinIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
