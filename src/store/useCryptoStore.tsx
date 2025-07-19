@@ -5,7 +5,7 @@ import { create } from "zustand";
 
 type Store = {
   marketData: MarketData[];
-  coinData: CoinData[] | null;
+  coinData: CoinData | null;
   coinList: Coin[];
   loading: boolean;
 

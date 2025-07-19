@@ -24,7 +24,7 @@ export const fetchCoinList = async (): Promise<Coin[]> => {
   return res.data;
 };
 
-export const fetchCoinData = async (coinId: string): Promise<CoinData[]> => {
+export const fetchCoinData = async (coinId: string): Promise<CoinData> => {
   const res = await axiosInstance.get(`/coins/${coinId}/market_chart`, {
     params: {
       vs_currency: "usd",
