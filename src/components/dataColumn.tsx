@@ -68,7 +68,7 @@ export const columns: ColumnDef<MarketData>[] = [
     ),
     cell: ({ row }) => {
       const value = row.getValue("price_change_percentage_24h");
-      const change = parseFloat(value);
+      const change = parseFloat(value as string);
       return (
         <div
           className={`text-center font-medium whitespace-nowrap ${

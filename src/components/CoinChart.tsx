@@ -26,8 +26,7 @@ const formatPrice = (value: number): string => {
 const CoinChart = ({ 
   prices, 
   loading = false, 
-  height = 300,
-  showLegend = true
+  height = 300
 }: CoinChartProps) => {
   const { theme } = useTheme();
 
@@ -119,22 +118,9 @@ const CoinChart = ({
         grid={{
           vertical: false,
           horizontal: true,
-          stroke: gridColor,
         }}
         colors={[lineColor]}
         slotProps={{
-          legend: {
-            hidden: !showLegend,
-            labelStyle: {
-              fill: legendColor,
-              fontSize: "0.875rem",
-              fontWeight: 500,
-            },
-            mark: {
-              width: 10,
-              height: 2,
-            },
-          },
         }}
         sx={{
           // Fix for the center price legend
