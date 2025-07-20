@@ -28,9 +28,9 @@ const CoinChart = ({ prices }: { prices: [number, number][] }) => {
     <div className="w-full h-full min-h-[300px]">
       <LineChart
         margin={{ top: 40, right: 30, left: 30, bottom: 50 }} // Increased top margin for legend
+        height={ 300 }
         sx={{
           width: '100%',
-          height: '100%',
           maxWidth: '100%',
           [`.${axisClasses.root}`]: {
             stroke: theme.palette.mode === "dark" ? "#aaa" : "#555",

@@ -1,88 +1,76 @@
-import { MultiSelectCombobox } from '@/components/Combobox';
-import { formatDollar } from '@/lib/formatters';
-import { useCryptoStore } from '@/store/useCryptoStore';
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
-import MultiCoinChart from '@/components/MultiCoinChart';
-import { Skeleton } from '@/components/ui/skeleton';
+import { MultiSelectCombobox } from "@/components/Combobox";
+import { formatDollar } from "@/lib/formatters";
+import { useCryptoStore } from "@/store/useCryptoStore";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import CoinChart from "@/components/CoinChart";
 
-export const Route = createFileRoute('/coin/compare')({
+export const Route = createFileRoute("/coin/compare")({
   component: ComparePage,
 });
 
 function ComparePage() {
-  const { marketData, getMarketData, getCoinData, loading } = useCryptoStore();
+  const { marketData, getMarketData, getMultiCoinData, loading } =
+    useCryptoStore();
   const [selected, setSelected] = useState<string[]>([]);
-  const [chartData, setChartData] = useState<Record<string, { prices: [number, number][], name: string }>>({});
+  const [chartCoins, setChartCoins] = useState<
+    { id: string; name: string; prices: [number, number][] }[]
+  >([]);
   const [isFetchingCharts, setIsFetchingCharts] = useState(false);
 
-  // Fetch initial market data
   useEffect(() => {
     getMarketData();
   }, []);
 
-  // Fetch chart data when selected coins change
   useEffect(() => {
-    const fetchSelectedCoinsData = async () => {
+    const fetchChartData = async () => {
       if (selected.length === 0) {
-        setChartData({});
+        setChartCoins([]);
         return;
       }
 
       setIsFetchingCharts(true);
-      
-      try {
-        const newChartData: typeof chartData = {};
-        
-        await Promise.all(selected.map(async (coinId) => {
-          // Only fetch if we don't already have this coin's data
-          if (!chartData[coinId]) {
-            const data = await getCoinData(coinId);
-            const coin = marketData.find(c => c.id === coinId);
-            if (data && coin) {
-              newChartData[coinId] = {
-                prices: data.prices,
-                name: coin.name
-              };
-            }
-          }
-        }));
+      const data = await getMultiCoinData(selected);
+      const coins = selected
+        .map((coinId) => {
+          const meta = marketData.find((c) => c.id === coinId);
+          if (!meta || !data[coinId]) return null;
+          return {
+            id: coinId,
+            name: meta.name,
+            prices: data[coinId].prices,
+          };
+        })
+        .filter(Boolean) as {
+        id: string;
+        name: string;
+        prices: [number, number][];
+      }[];
 
-        setChartData(prev => ({
-          ...prev,
-          ...newChartData
-        }));
-      } finally {
-        setIsFetchingCharts(false);
-      }
+      setChartCoins(coins);
+      setIsFetchingCharts(false);
     };
 
-    fetchSelectedCoinsData();
-  }, [selected]);
+    fetchChartData();
+  }, [selected, marketData, getMultiCoinData]);
 
   const coinOptions = useMemo(
-    () => marketData.map(coin => ({
-      label: coin.name,
-      value: coin.id,
-      icon: coin.image
-    })),
+    () =>
+      marketData.map((coin) => ({
+        label: coin.name,
+        value: coin.id,
+        image: coin.image,
+        symbol: coin.symbol.toUpperCase(),
+        change: coin.price_change_percentage_24h,
+      })),
     [marketData]
   );
 
   const comparedCoins = useMemo(
-    () => marketData.filter(coin => selected.includes(coin.id)),
+    () => marketData.filter((coin) => selected.includes(coin.id)),
     [marketData, selected]
-  );
-
-  const chartCoins = useMemo(
-    () => selected
-      .map(coinId => ({
-        id: coinId,
-        name: chartData[coinId]?.name || coinId,
-        prices: chartData[coinId]?.prices || []
-      }))
-      .filter(coin => coin.prices.length > 0), // Only include coins with price data
-    [selected, chartData]
   );
 
   if (loading && marketData.length === 0) {
@@ -108,51 +96,97 @@ function ComparePage() {
         value={selected}
         onChange={setSelected}
         placeholder="Select coins to compare"
-        maxSelected={5} // Limit number of coins to compare
+        maxSelected={5}
       />
 
       {comparedCoins.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse mt-4">
+        <div className="overflow-x-auto mt-4">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-muted/30">
               <tr>
                 <th className="p-2">Coin</th>
                 <th className="p-2">Price</th>
+                <th className="p-2">Change (24h)</th>
                 <th className="p-2">Market Cap</th>
                 <th className="p-2">24h Volume</th>
               </tr>
             </thead>
             <tbody>
-              {comparedCoins.map((coin) => (
-                <tr key={coin.id} className="border-t border-muted/20 hover:bg-muted/10">
-                  <td className="p-2 flex items-center gap-2">
-                    <img src={coin.image} alt={coin.name} className="w-5 h-5" />
-                    {coin.name}
-                  </td>
-                  <td className="p-2">{formatDollar(coin.current_price)}</td>
-                  <td className="p-2">{formatDollar(coin.market_cap)}</td>
-                  <td className="p-2">{formatDollar(coin.total_volume)}</td>
-                </tr>
-              ))}
+              {comparedCoins.map((coin) => {
+                const change = coin.price_change_percentage_24h;
+                const isPositive = change >= 0;
+
+                return (
+                  <tr
+                    key={coin.id}
+                    className="border-t border-muted/20 hover:bg-muted/10"
+                  >
+                    <td className="p-2 flex items-center gap-2">
+                      <img
+                        src={coin.image}
+                        alt={coin.name}
+                        className="w-5 h-5"
+                        onError={(e) =>
+                          ((e.target as HTMLImageElement).src =
+                            "/fallback-coin.png")
+                        }
+                      />
+                      <span className="font-medium">
+                        {coin.name}
+                        <span className="ml-1 text-xs text-muted-foreground">
+                          ({coin.symbol.toUpperCase()})
+                        </span>
+                      </span>
+                    </td>
+                    <td className="p-2">{formatDollar(coin.current_price)}</td>
+                    <td className="p-2">
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded text-sm font-medium",
+                          isPositive
+                            ? "bg-green-500/10 text-green-400"
+                            : "bg-red-500/10 text-red-400"
+                        )}
+                      >
+                        {isPositive ? "+" : ""}
+                        {change.toFixed(2)}%
+                      </span>
+                    </td>
+                    <td className="p-2">{formatDollar(coin.market_cap)}</td>
+                    <td className="p-2">{formatDollar(coin.total_volume)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Price Comparison</h2>
-        {isFetchingCharts ? (
-          <Skeleton className="w-full h-[400px]" />
-        ) : chartCoins.length > 0 ? (
-          <MultiCoinChart coins={chartCoins} />
-        ) : (
-          <p className="text-muted-foreground">
-            {selected.length > 0 
-              ? "Loading chart data..." 
-              : "Select coins above to compare their performance"}
-          </p>
-        )}
-      </div>
+      {selected.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Price Comparison</h2>
+          {isFetchingCharts ? (
+            <Skeleton className="w-full h-[400px]" />
+          ) : chartCoins.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {chartCoins.map((coin) => (
+                <div key={coin.id} className="w-full max-w-full">
+                  <h3 className="text-lg font-semibold mb-2 text-center">
+                    {coin.name}
+                  </h3>
+                  <div className="bg-muted rounded-xl p-4">
+                    <div className="h-[300px] sm:h-[350px] xl:h-[400px]">
+                      <CoinChart prices={coin.prices} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No chart data available.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

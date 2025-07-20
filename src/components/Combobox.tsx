@@ -16,13 +16,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-type Option = { value: string; label: string };
+type Option = {
+  value: string;
+  label: string;
+  symbol: string;
+  image: string;
+};
 
 interface MultiSelectComboboxProps {
   options: Option[];
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
+  maxSelected?: number;
 }
 
 export function MultiSelectCombobox({
@@ -30,8 +36,21 @@ export function MultiSelectCombobox({
   value,
   onChange,
   placeholder = "Select options",
+  maxSelected = 5,
 }: MultiSelectComboboxProps) {
   const [open, setOpen] = React.useState(false);
+
+  const selectedOptions = options.filter((opt) => value.includes(opt.value));
+
+  const handleSelect = (val: string) => {
+    if (value.includes(val)) {
+      onChange(value.filter((v) => v !== val));
+    } else {
+      if (value.length < maxSelected) {
+        onChange([...value, val]);
+      }
+    }
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,41 +61,63 @@ export function MultiSelectCombobox({
           aria-expanded={open}
           className="w-[300px] justify-between"
         >
-          {value.length > 0
-            ? `${value.length} selected`
-            : placeholder}
+          {value.length > 0 ? (
+            <div className="flex items-center gap-2 overflow-hidden">
+              {selectedOptions.slice(0, 3).map((opt) => (
+                <img
+                  key={opt.value}
+                  src={opt.image}
+                  alt={opt.label}
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+              ))}
+              {value.length > 3 && (
+                <span className="text-sm text-muted-foreground">
+                  +{value.length - 3}
+                </span>
+              )}
+            </div>
+          ) : (
+            placeholder
+          )}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-[300px] p-0">
         <Command>
           <CommandInput placeholder="Search coin..." />
           <CommandList>
             <CommandEmpty>No coin found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={() => {
-                    if (value.includes(option.value)) {
-                      onChange(value.filter((v) => v !== option.value));
-                    } else {
-                      onChange([...value, option.value]);
-                    }
-                  }}
-                >
-                  <CheckIcon
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value.includes(option.value)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              ))}
+              {options.map((option) => {
+                const isSelected = value.includes(option.value);
+                const isDisabled = !isSelected && value.length >= maxSelected;
+
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    disabled={isDisabled}
+                    onSelect={() => handleSelect(option.value)}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <CheckIcon
+                        className={cn(
+                          "h-4 w-4",
+                          isSelected ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <img
+                        src={option.image}
+                        alt={`${option.label} logo`}
+                        className="w-5 h-5 rounded-full object-cover"
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>
