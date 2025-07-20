@@ -249,8 +249,8 @@ function ComparePage() {
                       {coin.name}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px]">
+                  <CardContent className="p-0">
+                    <div className="h-[400px] ">
                       <CoinChart prices={coin.prices} />
                     </div>
                   </CardContent>

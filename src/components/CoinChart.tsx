@@ -5,7 +5,7 @@ import {
   markElementClasses,
   axisClasses,
 } from "@mui/x-charts";
-import { useTheme } from "@/components/theme-provider"; // Your Tailwind theme provider
+import { useTheme } from "@/components/theme-provider";
 import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -26,7 +26,7 @@ const formatPrice = (value: number): string => {
 const CoinChart = ({ 
   prices, 
   loading = false, 
-  height = 300
+  height = 350
 }: CoinChartProps) => {
   const { theme } = useTheme();
 
@@ -44,8 +44,7 @@ const CoinChart = ({
     : theme;
 
   const isDark = currentTheme === 'dark';
-  
-  // Color definitions
+
   const textColor = isDark ? "#e5e7eb" : "#4b5563";
   const labelColor = isDark ? "#f9fafb" : "#111827";
   const lineColor = isDark ? "#60a5fa" : "#3b82f6";
@@ -80,7 +79,7 @@ const CoinChart = ({
     <div className="w-full" style={{ height: `${height}px` }}>
       <LineChart
         height={height}
-        margin={{ top: 20, right: 30, left: 50, bottom: 50 }}
+        margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
         xAxis={[
           {
             data: chartData.map((d) => d.time),
@@ -123,30 +122,25 @@ const CoinChart = ({
         slotProps={{
         }}
         sx={{
-          // Fix for the center price legend
           '& .MuiChartsAxis-tickLabel': {
             fill: `${textColor} !important`,
           },
           '& .MuiChartsAxis-label': {
             fill: `${labelColor} !important`,
           },
-          // Axis styling
           [`& .${axisClasses.root}`]: {
             [`& .${axisClasses.line}`]: {
               stroke: gridColor,
               strokeWidth: 1,
             },
           },
-          // Line styling
           [`& .${lineElementClasses.root}`]: {
             strokeWidth: 2,
             stroke: lineColor,
           },
-          // Hide marks
           [`& .${markElementClasses.root}`]: {
             display: "none",
           },
-          // Legend styling
           '& .MuiChartsLegend-root': {
             '& .MuiChartsLegend-series': {
               '& text': {
@@ -158,7 +152,6 @@ const CoinChart = ({
               },
             },
           },
-          // Grid lines
           '& .MuiChartsAxis-grid': {
             stroke: gridColor,
             strokeDasharray: '3 3',

@@ -148,7 +148,7 @@ function CoinDetailPage() {
           <TrendingUp className="w-5 h-5" />
           <h2 className="text-lg font-medium text-foreground">Price Chart</h2>
         </div>
-        <div className="p-4 bg-card rounded-xl border shadow-sm h-[400px]">
+        <div className="bg-card rounded-xl border shadow-sm h-[400px]">
           {coinData?.prices && (
             <div className="w-full h-full min-h-[300px]">
               <CoinChart 
