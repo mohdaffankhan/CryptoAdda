@@ -1,4 +1,4 @@
-import CoinSearch from "@/components/coinSearch";
+import CoinSearch from "@/components/CoinSearch";
 import { ModeToggle } from "@/components/mode-toggle";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
