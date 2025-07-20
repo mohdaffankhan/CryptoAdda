@@ -35,11 +35,10 @@ export function MultiSelectCombobox({
   options,
   value,
   onChange,
-  placeholder = "Select options",
+  placeholder = "Select coins",
   maxSelected = 5,
 }: MultiSelectComboboxProps) {
   const [open, setOpen] = React.useState(false);
-
   const selectedOptions = options.filter((opt) => value.includes(opt.value));
 
   const handleSelect = (val: string) => {
@@ -59,7 +58,7 @@ export function MultiSelectCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[300px] justify-between"
+          className="w-full sm:w-[300px] justify-between rounded-lg bg-muted/60 backdrop-blur border border-border text-sm font-normal transition-all"
         >
           {value.length > 0 ? (
             <div className="flex items-center gap-2 overflow-hidden">
@@ -72,22 +71,29 @@ export function MultiSelectCombobox({
                 />
               ))}
               {value.length > 3 && (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   +{value.length - 3}
                 </span>
               )}
             </div>
           ) : (
-            placeholder
+            <span className="text-muted-foreground truncate">{placeholder}</span>
           )}
-          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 opacity-50 shrink-0" />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent
+        side="bottom"
+        align="start"
+        className="w-full sm:w-[300px] p-0 rounded-lg border border-border bg-popover shadow-xl"
+      >
         <Command>
-          <CommandInput placeholder="Search coin..." />
-          <CommandList>
+          <CommandInput
+            placeholder="Search coins..."
+            className="placeholder:text-muted-foreground"
+          />
+          <CommandList className="max-h-60 overflow-y-auto">
             <CommandEmpty>No coin found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
@@ -100,21 +106,23 @@ export function MultiSelectCombobox({
                     value={option.value}
                     disabled={isDisabled}
                     onSelect={() => handleSelect(option.value)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 cursor-pointer",
+                      isDisabled && "opacity-50 pointer-events-none"
+                    )}
                   >
-                    <div className="flex items-center gap-2 w-full">
-                      <CheckIcon
-                        className={cn(
-                          "h-4 w-4",
-                          isSelected ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <img
-                        src={option.image}
-                        alt={`${option.label} logo`}
-                        className="w-5 h-5 rounded-full object-cover"
-                      />
-                      <span>{option.label}</span>
-                    </div>
+                    <CheckIcon
+                      className={cn(
+                        "h-4 w-4 text-primary transition-opacity",
+                        isSelected ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <img
+                      src={option.image}
+                      alt={`${option.label} logo`}
+                      className="w-5 h-5 rounded-full object-cover"
+                    />
+                    <span className="truncate">{option.label}</span>
                   </CommandItem>
                 );
               })}

@@ -34,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,6 +42,8 @@ interface DataTableProps<TData, TValue> {
   searchColumn?: string;
   searchPlaceholder?: string;
   pageSizeOptions?: number[];
+  className?: string;
+  loading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -49,6 +52,8 @@ export function DataTable<TData, TValue>({
   searchColumn = "name",
   searchPlaceholder = "Filter currencies...",
   pageSizeOptions = [10, 20, 30, 40, 50],
+  className,
+  loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -68,8 +73,62 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  if (loading) {
+    return (
+      <div className={`w-full space-y-4 ${className}`}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Skeleton className="h-10 w-full sm:w-72" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-[80px]" />
+          </div>
+        </div>
+        
+        <div className="rounded-lg border border-muted-foreground/20 bg-background shadow-sm overflow-hidden">
+          <div className="relative w-full overflow-auto">
+            <Table className="min-w-[768px]">
+              <TableHeader className="bg-muted/30">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="px-4 py-3">
+                        <Skeleton className="h-4 w-24" />
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {[...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    {columns.map((_, j) => (
+                      <TableCell key={j} className="px-4 py-3">
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Skeleton className="h-4 w-48" />
+          <div className="flex items-center gap-1">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full space-y-4">
+    <div className={`w-full space-y-4 ${className}`}>
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -84,7 +143,7 @@ export function DataTable<TData, TValue>({
             className="pl-9 focus-visible:ring-2 focus-visible:ring-primary/50"
           />
         </div>
-        
+
         <div className="flex items-center gap-2">
           <p className="text-sm text-muted-foreground">Rows per page</p>
           <Select
@@ -96,10 +155,13 @@ export function DataTable<TData, TValue>({
             <SelectTrigger className="h-8 w-[80px] border-muted-foreground/30 hover:border-muted-foreground/50">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
-            <SelectContent side="top" className="bg-background border border-muted-foreground/20">
+            <SelectContent
+              side="top"
+              className="bg-background border border-muted-foreground/20"
+            >
               {pageSizeOptions.map((pageSize) => (
-                <SelectItem 
-                  key={pageSize} 
+                <SelectItem
+                  key={pageSize}
                   value={`${pageSize}`}
                   className="hover:bg-muted/50 focus:bg-muted/50"
                 >
@@ -163,8 +225,12 @@ export function DataTable<TData, TValue>({
                   >
                     <div className="flex flex-col items-center justify-center gap-2 py-8">
                       <Search className="h-8 w-8 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">No currencies found</p>
-                      <p className="text-sm text-muted-foreground/60">Try adjusting your search or filter</p>
+                      <p className="text-muted-foreground">
+                        No currencies found
+                      </p>
+                      <p className="text-sm text-muted-foreground/60">
+                        Try adjusting your search or filter
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -196,7 +262,7 @@ export function DataTable<TData, TValue>({
           </span>{" "}
           currencies
         </div>
-        
+
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -217,14 +283,14 @@ export function DataTable<TData, TValue>({
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only sm:not-sr-only sm:ml-2">Previous</span>
           </Button>
-          
+
           <div className="flex items-center justify-center text-sm font-medium px-4">
             <span className="text-foreground/80">
               Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </span>
           </div>
-          
+
           <Button
             variant="ghost"
             size="sm"
